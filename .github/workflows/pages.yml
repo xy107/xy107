@@ -1,0 +1,59 @@
+# Deploys website/ to GitHub Pages at https://xy107.github.io/xy107/.
+# Runs when a GitHub Release is published with tag vMAJOR.MINOR.PATCH.website
+# (example: v1.0.1.website). Set Pages source to GitHub Actions.
+# Allow this tag pattern on the github-pages environment
+# (Settings → Environments → github-pages → Deployment branches and tags).
+name: Website Pages
+on:
+  release:
+    types: [published]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    if: startsWith(github.event.release.tag_name, 'v') && endsWith(github.event.release.tag_name, '.website')
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - name: Check release tag
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+\.website$ ]]; then
+            echo "Release tag must match vMAJOR.MINOR.PATCH.website, got: $TAG"
+            exit 1
+          fi
+        working-directory: .
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - run: npm ci
+      - name: Build mainnet site
+        run: npm run build
+        env:
+          VITE_CHAIN_ID: '1'
+          VITE_XY_ADDRESS: ${{ vars.XY_ADDRESS || '0xE7554Fb5D283C4944D7bDFcae4Fe8dA012D977fb' }}
+          VITE_XY107_ADDRESS: ${{ vars.XY107_ADDRESS || '0xa3028BBda1f6fE3e68dce5d756D9cDb343008969' }}
+          VITE_DEPLOYMENT_BLOCK: ${{ vars.DEPLOYMENT_BLOCK || '25909975' }}
+          VITE_RPC_URL: ${{ vars.MAINNET_RPC_URL || 'https://ethereum-rpc.publicnode.com' }}
+          VITE_WALLETCONNECT_PROJECT_ID: ${{ vars.WALLETCONNECT_PROJECT_ID }}
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: website/dist
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
