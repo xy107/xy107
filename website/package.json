@@ -1,0 +1,47 @@
+{
+  "name": "xy107-website",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc -b && vite build && node scripts/pages.mjs",
+    "preview": "vite preview --host 127.0.0.1",
+    "local:deploy": "node scripts/local-deploy.mjs",
+    "test:e2e": "playwright test",
+    "format": "prettier --write src scripts tests *.ts *.json *.md",
+    "check:format": "prettier --check src scripts tests *.ts *.json *.md",
+    "test:pages": "playwright test --config playwright.pages.config.ts"
+  },
+  "dependencies": {
+    "@fontsource-variable/dm-sans": "^5.3.0",
+    "@fontsource-variable/public-sans": "^5.3.0",
+    "@phosphor-icons/react": "^2.1.10",
+    "@radix-ui/react-dialog": "^1.1.23",
+    "@tanstack/react-query": "^5.102.8",
+    "@walletconnect/ethereum-provider": "^2.24.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "sonner": "^2.0.8",
+    "viem": "^2.56.3",
+    "wagmi": "^3.7.7"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^26.4.1",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "prettier": "^3.9.6",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.3",
+    "vite": "^8.2.2"
+  },
+  "overrides": {
+    "@coinbase/cdp-sdk": {
+      "axios": "^1.20.0"
+    }
+  }
+}
